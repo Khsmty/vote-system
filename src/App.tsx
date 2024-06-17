@@ -45,6 +45,15 @@ function App() {
 		}
 	}
 
+	function undo() {
+		if (nowVote === 1) return;
+
+		const tmp = [...tmpVote];
+		tmp.pop();
+		setTmpVote(tmp);
+		setNowVote(nowVote - 1);
+	}
+
 	function nextPlayer() {
 		setVotes([...votes, tmpVote]);
 
@@ -109,14 +118,14 @@ function App() {
 			<div className="flex flex-col items-center min-h-svh justify-center">
 				<p className="text-3xl font-bold">{players[nowPlayer]} さんの番です</p>
 
-				<div className="my-5 text-2xl flex flex-col items-end">
+				<div className="my-5 text-4xl flex flex-col items-end">
 					{[0, 1, 2, 3, 4, 5].map((i) => {
 						if (i === nowPlayer) return;
 						return (
 							<div key={i} className="flex items-center gap-2 my-2">
 								<p>{players[i]} …</p>
 								<div
-									className={`size-6 rounded-full ${nowVote === i ? "border border-black animate-pulse" : ""}`}
+									className={`size-12 rounded-full ${nowVote === i ? "border border-black animate-pulse" : ""}`}
 									style={{
 										background: tmpVote[i] as string,
 									}}
@@ -128,7 +137,7 @@ function App() {
 
 				{nowVote !== 6 && (
 					<>
-						<div className="grid grid-cols-4 gap-2">
+						<div className="grid grid-cols-4 gap-4 mt-5 mb-2">
 							{(
 								[
 									"red",
@@ -145,16 +154,23 @@ function App() {
 									<button
 										key={color}
 										type="button"
-										className="size-10 rounded-full border border-gray-400"
+										className="size-14 rounded-full border border-gray-400"
 										style={{ background: color }}
 										onClick={() => vote(color)}
 									/>
 								);
 							})}
 						</div>
-						<p className="text-gray-600 text-sm mt-2">色をタップして投票</p>
 					</>
 				)}
+
+				<button
+					type="button"
+					className="border border-gray-500 px-5 py-2 rounded-full mt-3"
+					onClick={() => undo()}
+				>
+					取り消し
+				</button>
 
 				{nowVote === 6 && (
 					<button
