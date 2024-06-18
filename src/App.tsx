@@ -11,8 +11,8 @@ type Color =
 	| "black";
 
 function App() {
-	const [nowPlayer, setNowPlayer] = useState(0);
-	const [nowVote, setNowVote] = useState(1);
+	const [currentPlayer, setCurrentPlayer] = useState(0);
+	const [currentVote, setCurrentVote] = useState(1);
 	const [status, setStatus] = useState(0);
 	const [tmpVote, setTmpVote] = useState<(Color | null)[]>([null]);
 	const [players, setPlayers] = useState<(string | null)[]>([
@@ -26,29 +26,29 @@ function App() {
 	const [votes, setVotes] = useState<(Color | null)[][]>([]);
 
 	function vote(color: Color) {
-		if (nowVote === 6) return;
+		if (currentVote === 6) return;
 
 		const tmp = [...tmpVote, color];
 
 		if (
-			(nowPlayer !== 5 && nowVote <= 5) ||
-			(nowPlayer === 5 && nowVote <= 4)
+			(currentPlayer !== 5 && currentVote <= 5) ||
+			(currentPlayer === 5 && currentVote <= 4)
 		) {
-			let next = nowVote + 1;
-			if (next === nowPlayer) {
+			let next = currentVote + 1;
+			if (next === currentPlayer) {
 				tmp.push(null);
 				next++;
 			}
 
 			setTmpVote(tmp);
-			setNowVote(next);
+			setCurrentVote(next);
 		}
 	}
 
 	function undo() {
 		if (
-			(nowPlayer === 0 && nowVote === 1) ||
-			(nowPlayer !== 0 && nowVote === 0)
+			(currentPlayer === 0 && currentVote === 1) ||
+			(currentPlayer !== 0 && currentVote === 0)
 		) {
 			return alert("これ以上は取り消せません");
 		}
@@ -62,8 +62,8 @@ function App() {
 
 		setTmpVote(tmp);
 
-		const next = nowVote - 1;
-		setNowVote(next === nowPlayer ? next - 1 : next);
+		const next = currentVote - 1;
+		setCurrentVote(next === currentPlayer ? next - 1 : next);
 	}
 
 	function sendPlayers() {
@@ -77,18 +77,18 @@ function App() {
 	function nextPlayer() {
 		setVotes([...votes, tmpVote]);
 
-		if (nowPlayer === 5) return setStatus(2);
+		if (currentPlayer === 5) return setStatus(2);
 
 		setTmpVote([]);
-		setNowPlayer(nowPlayer + 1);
-		setNowVote(0);
+		setCurrentPlayer(currentPlayer + 1);
+		setCurrentVote(0);
 	}
 
 	function reload() {
 		if (!window.confirm("結果をリセットしてもよろしいですか？")) return;
 
-		setNowPlayer(0);
-		setNowVote(1);
+		setCurrentPlayer(0);
+		setCurrentVote(1);
 		setStatus(0);
 		setTmpVote([null]);
 		setPlayers([null, null, null, null, null, null]);
@@ -132,16 +132,18 @@ function App() {
 	if (status === 1) {
 		return (
 			<div className="flex flex-col items-center min-h-svh justify-center">
-				<p className="text-3xl font-bold">{players[nowPlayer]} さんの番です</p>
+				<p className="text-3xl font-bold">
+					{players[currentPlayer]} さんの番です
+				</p>
 
 				<div className="my-5 text-4xl flex flex-col items-end">
 					{[0, 1, 2, 3, 4, 5].map((i) => {
-						if (i === nowPlayer) return;
+						if (i === currentPlayer) return;
 						return (
 							<div key={i} className="flex items-center gap-2 my-2">
 								<p>{players[i]} …</p>
 								<div
-									className={`size-12 rounded-full ${nowVote === i ? "border border-black animate-pulse" : ""}`}
+									className={`size-12 rounded-full ${currentVote === i ? "border border-black animate-pulse" : ""}`}
 									style={{
 										background: tmpVote[i] as string,
 									}}
@@ -151,7 +153,7 @@ function App() {
 					})}
 				</div>
 
-				{nowVote !== 6 && (
+				{currentVote !== 6 && (
 					<>
 						<div className="grid grid-cols-4 gap-4 mt-5 mb-2">
 							{(
@@ -188,13 +190,13 @@ function App() {
 					取り消し
 				</button>
 
-				{nowVote === 6 && (
+				{currentVote === 6 && (
 					<button
 						type="button"
 						className="bg-blue-700 text-white px-5 py-2 rounded-full mt-3"
 						onClick={() => nextPlayer()}
 					>
-						{nowPlayer === 5 ? "結果を見る" : "次のプレイヤーへ"}
+						{currentPlayer === 5 ? "結果を見る" : "次のプレイヤーへ"}
 					</button>
 				)}
 			</div>
