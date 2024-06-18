@@ -46,12 +46,32 @@ function App() {
 	}
 
 	function undo() {
-		if (nowVote === 1) return;
+		if (
+			(nowPlayer === 0 && nowVote === 1) ||
+			(nowPlayer !== 0 && nowVote === 0)
+		) {
+			return alert("これ以上は取り消せません");
+		}
 
 		const tmp = [...tmpVote];
-		tmp.pop();
+		const last = tmp.pop();
+
+		if (last === null) {
+			tmp.pop();
+		}
+
 		setTmpVote(tmp);
-		setNowVote(nowVote - 1);
+
+		const next = nowVote - 1;
+		setNowVote(next === nowPlayer ? next - 1 : next);
+	}
+
+	function sendPlayers() {
+		if (players.some((p) => !p)) {
+			return alert("全てのプレイヤー名を入力してください");
+		}
+
+		setStatus(1);
 	}
 
 	function nextPlayer() {
@@ -101,11 +121,7 @@ function App() {
 				<button
 					type="button"
 					className="bg-blue-700 text-white px-5 py-2 rounded-full mt-5"
-					onClick={() => {
-						if (players.some((p) => !p))
-							return alert("全てのプレイヤー名を入力してください");
-						setStatus(1);
-					}}
+					onClick={() => sendPlayers()}
 				>
 					スタート
 				</button>
